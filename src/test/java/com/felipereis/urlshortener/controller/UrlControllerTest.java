@@ -58,7 +58,7 @@ class UrlControllerTest {
 
     @Test
     void deveRetornar409QuandoAliasJaEstaEmUso() {
-        EncurtarUrlRequest request = new EncurtarUrlRequest("https://www.google.com", "alias-repetido");
+        EncurtarUrlRequest request = new EncurtarUrlRequest("https://www.google.com", "repetido");
         String url = "http://localhost:" + port + "/api/urls";
 
         // Primeira vez: cria com sucesso
@@ -68,7 +68,7 @@ class UrlControllerTest {
         ResponseEntity<String> resposta = restTemplate.postForEntity(url, request, String.class);
 
         assertThat(resposta.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(resposta.getBody()).contains("alias-repetido");
+        assertThat(resposta.getBody()).contains("repetido");
     }
 
     @Test
