@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.Optional;
 
 @Repository
@@ -27,9 +26,9 @@ public class UrlRepository {
     );
 
     public boolean existeCodigoCurto(String codigoCurto) {
-        String sql = "SELECT COUNT(*) FROM urls WHERE codigo_curto = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, codigoCurto);
-        return count != null && count > 0;
+        String sql = "SELECT EXISTS(SELECT 1 FROM urls WHERE codigo_curto = ?)";
+        Boolean existe = jdbcTemplate.queryForObject(sql, Boolean.class, codigoCurto);
+        return existe != null && existe;
     }
 
     public Url salvar(Url url) {
@@ -37,13 +36,13 @@ public class UrlRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
             ps.setString(1, url.getUrlOriginal());
             ps.setString(2, url.getCodigoCurto());
             return ps;
         }, keyHolder);
 
-        url.setId(keyHolder.getKey().longValue());
+        url.setId(keyHolder.getKeyAs(Long.class));
         return url;
     }
 
